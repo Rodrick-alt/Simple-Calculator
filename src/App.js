@@ -12,24 +12,30 @@ function App() {
 
 
   function handleEquation(target) {
-    if (equation === '00' || resetFlag) {
-      setEquation(old => '');
+    if (resetFlag === true) {
+      setEquation(old => String(target));
       setResetFlag(old => false);
+    } else if ((/^[0-9.+\-*/]+$/).test(target)) {
+      setEquation(old => {
+        let temp = old;
+        if (temp === '00') {
+          return String(target)
+        }
+        return temp += String(target)
+      });
     }
 
-    if (target === 'DEL') {
+    if (target === 'DEL' && resetFlag === true) {
+      setEquation(old => '00');
+      setResetFlag(old => false);
+    } else if (target === 'DEL' && equation !== '00') {
       let arr = equation.split('');
       let temp = arr.slice(0, arr.length - 1);
       temp = temp.join('');
-      if (temp !== '' && equation !== '00') {
-        if ((/^[0-9.+\-*/]+$/).test(temp))
-          setEquation(old => temp)
-      } else (
+      if (temp === '') {
         setEquation(old => '00')
-      )
-    } else {
-      if ((/^[0-9.+\-*/]+$/).test(target)) {
-        setEquation(old => old += target)
+      } else if ((/^[0-9.+\-*/]+$/).test(temp)) {
+        setEquation(old => temp)
       }
     }
   }
@@ -47,6 +53,10 @@ function App() {
     }
   }
 
+  function handleReset() {
+    setEquation(old => '00');
+    setResetFlag(old => false);
+  }
 
   function handleTheme(target) {
     console.log(target === 'one');
@@ -133,7 +143,7 @@ function App() {
           <button id='MULTIPLY' onClick={() => handleEquation('*')}><span className='front'>*</span></button>
         </div>
         <div className='row'>
-          <button id='RESET' className='btn--reset' onClick={() => setEquation(old => '00')}><span className='front'>RESET</span></button>
+          <button id='RESET' className='btn--reset' onClick={() => handleReset()}><span className='front'>RESET</span></button>
           <button id='EQUAL' className='btn--equal' onClick={() => handleEvaluation(equation)}><span className='front'>=</span></button>
         </div>
       </section>
